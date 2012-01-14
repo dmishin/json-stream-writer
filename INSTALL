@@ -1,0 +1,19 @@
+Installation is not needed, the library is contained in 2 files and can be added to a project.
+
+However, it is possible to compile it as a separate library.
+
+To compile:
+   1) Install CMake, if not installed yet.
+
+   cd json-stream-writer
+   mkdir build
+   cd build
+   cmake ../
+   make
+
+To comple and run tests, you need GTest. Simply unpack it (don't compile), and put symlink to the Gtest folder in the 'ext' folder of the project, link must have name 'gtest'
+
+   cd json-stream-writer
+   mkdir ext
+   cd ext
+   ln -s /path/to/gtest-1.6.0 gtest

@@ -1,0 +1,18 @@
+Simple and fast C++ library for streamed generation of JSON files.
+
+Features
+    1) Takes care of boring details:
+       - correctly separating values with commas
+       - escaping strings
+       - open and close tags
+    2) Validation: ensures that generated JSON has correct format
+       Attempt to generate incorrect file will cause an exception.
+    3) It is simplier than generating data by hand.
+
+Has no dependencies and fully contained in 2 files: 
+    json_writer.hpp, json_writer.cpp
+
+Sample usage is in the sample.cpp
+
+Tests are written with Gtest.
+

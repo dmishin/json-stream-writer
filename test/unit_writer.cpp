@@ -261,3 +261,48 @@ TEST( Validation, ObjectField ){
   w.begin_object();w.name("field");
   ASSERT_THROW( w.end_array(), JsonWriterStateError ); //unexpected end
 }
+
+TEST( Writer, CloseAll ){
+  using namespace std;
+  stringstream s;
+  JsonWriter w(s);
+
+  w.begin_object();
+  w.name("fld");
+  w.begin_array();
+  w.begin_array();
+  w.begin_object();
+  
+  w.close_all();
+  EXPECT_EQ( s.str(), "{\"fld\":[[{}]]}" );
+}
+TEST( Writer, CloseToLevel ){
+  using namespace std;
+  stringstream s;
+  JsonWriter w(s);
+
+  w.begin_object();
+  w.name("fld");
+  w.begin_array();
+  w.begin_array();
+  w.begin_object();
+  
+  w.close_all(2);
+  w.end_array();
+  w.end_object();
+  EXPECT_EQ( s.str(), "{\"fld\":[[{}]]}" );
+}
+TEST( Writer, AutoClose ){
+  using namespace std;
+  stringstream s;
+  {
+    JsonWriter w(s, true);
+
+    w.begin_object();
+    w.name("fld");
+    w.begin_array();
+    w.begin_array();
+    w.begin_object();
+  }
+  EXPECT_EQ( s.str(), "{\"fld\":[[{}]]}" );
+}

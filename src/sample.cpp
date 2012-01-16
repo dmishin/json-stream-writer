@@ -17,6 +17,7 @@ JsonWriter & operator<<(JsonWriter& w, std::pair<T,T> begin_end)
     ++begin;
   }
   w << end_array;
+  return w;
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Testing

@@ -17,8 +17,10 @@ void JsonWriter::reset()
 }
 JsonWriter::~JsonWriter()
 {
-  if (auto_close)
+  if (is_auto_close())
     close_all();
+  if (is_verify_on_exit())
+    assert_finished();
 }
 /**Close several levels of braces (curly and square)*/
 void JsonWriter::close_all( size_t to_level )
@@ -65,10 +67,12 @@ void JsonWriter::put_str( const std::string &value)
 }
 
 /**How the state is changed after writing 1 value*/
-void JsonWriter::switch_state_value()
+void JsonWriter::switch_state_value( bool is_atomic)
 {
   switch(state){
   case S_EMPTY: 
+    if (is_strict() && is_atomic)
+      throw JsonWriterStateError("In strict mode, atomic values can't be at the top level");
     state = S_FINISHED; 
     break;
   case S_ARRAY_EMPTY: 
@@ -98,7 +102,7 @@ void JsonWriter::pop_state()
 }
 void JsonWriter::value( const char *value )
 {
-  switch_state_value();
+  switch_state_value(true);
   stream<<'"';
   while (*value){
     put_char(*value);
@@ -109,49 +113,49 @@ void JsonWriter::value( const char *value )
 
 void JsonWriter::value( int value )
 {
-  switch_state_value();
+  switch_state_value(true);
   stream << value;
 }
 void JsonWriter::value( long value )
 {
-  switch_state_value();
+  switch_state_value(true);
   stream << value;
 }
 void JsonWriter::value( double value)
 {
-  switch_state_value();
+  switch_state_value(true);
   stream <<std::setprecision(16)<< value; //16 must be enough for exact storing of `double`
 }
 void JsonWriter::value( float value)
 {
-  switch_state_value();
+  switch_state_value(true);
   stream <<std::setprecision(8)<< value; //8 must be enough for exact storing of `float`
 }
 void JsonWriter::value( char value )
 {
-  switch_state_value();
+  switch_state_value(true);
   stream << '"';
   put_char( value );
   stream << '"';
 }
 void JsonWriter::value( const std::string &value)
 {
-  switch_state_value();
+  switch_state_value(true);
   put_str(value);
 }
 void JsonWriter::value( bool value )
 {
-  switch_state_value();
+  switch_state_value(true);
   stream<<(value?"true":"false");
 }
 void JsonWriter::value_null()
 {
-  switch_state_value();
+  switch_state_value(true);
   stream<<"null";
 }
 void JsonWriter::begin_array()
 {
-  switch_state_value();
+  switch_state_value(false);
   push_state();
   state = S_ARRAY_EMPTY;
   stream << '[';
@@ -170,7 +174,7 @@ void JsonWriter::end_array()
 }
 void JsonWriter::begin_object()
 {
-  switch_state_value(); //objects are values too
+  switch_state_value(false); //objects are values too
   push_state();
   state = S_OBJ_EMPTY;
   stream << '{';

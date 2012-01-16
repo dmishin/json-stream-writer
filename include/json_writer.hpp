@@ -24,18 +24,26 @@ public:
     S_OBJ_NONEMPTY,
     S_FINISHED
   };
+  enum flags{
+    F_AUTO_CLOSE = 0x1,
+    F_STRICT = 0x2,
+    F_VERIFY_ON_EXIT = 0x4
+  };
 private:
   typedef std::vector<State> StateStack;
   State state;
   StateStack stack;
   std::ostream& stream;
-  bool auto_close;
+  int flags;
 public:
-  JsonWriter(std::ostream & os, bool auto_close_=false)
+  JsonWriter(std::ostream & os, int flags_ = 0)
     :state(S_EMPTY)
     ,stream(os)
-    ,auto_close(auto_close_){};
+    ,flags(flags_){};
   ~JsonWriter();
+  bool is_auto_close()const{ return (flags & F_AUTO_CLOSE) != 0; };
+  bool is_strict()const{ return (flags & F_STRICT) != 0; };
+  bool is_verify_on_exit()const{ return (flags & F_VERIFY_ON_EXIT) != 0; };
 
   void value(int value);
   void value(long value);
@@ -64,7 +72,7 @@ private:
   void put_str( const std::string &s );
   void push_state();
   void pop_state();
-  void switch_state_value();
+  void switch_state_value(bool is_atomic);
   void put_char(char c);
 };
 

@@ -296,7 +296,7 @@ TEST( Writer, AutoClose ){
   using namespace std;
   stringstream s;
   {
-    JsonWriter w(s, true);
+    JsonWriter w(s, JsonWriter::F_AUTO_CLOSE);
 
     w.begin_object();
     w.name("fld");

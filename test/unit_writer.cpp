@@ -306,3 +306,26 @@ TEST( Writer, AutoClose ){
   }
   EXPECT_EQ( s.str(), "{\"fld\":[[{}]]}" );
 }
+
+TEST( Writer, StrictFlag ){
+  using namespace std;
+  stringstream s;
+  JsonWriter w(s, JsonWriter::F_STRICT);
+  ASSERT_THROW( w.value(10), JsonWriterStateError);
+  w.reset();
+  ASSERT_THROW( w.value(10.0), JsonWriterStateError);
+  w.reset();
+  ASSERT_THROW( w.value(false), JsonWriterStateError);
+  w.reset();
+  ASSERT_THROW( w.value("hello"), JsonWriterStateError);
+  w.reset();
+  ASSERT_THROW( w.value(string("std::hello")), JsonWriterStateError);
+  w.reset();
+  ASSERT_THROW( w.value_null(), JsonWriterStateError);
+  
+  w.reset();
+  ASSERT_NO_THROW( w.begin_array() );
+  w.reset();
+  ASSERT_NO_THROW( w.begin_object() );
+
+}
